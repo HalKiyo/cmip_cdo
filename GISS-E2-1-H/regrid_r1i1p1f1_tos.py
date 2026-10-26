@@ -1,27 +1,18 @@
-import cartopy.crs as ccrs
-import xarray as xr
-from netCDF4 import Dataset
-from cdo import Cdo
-import matplotlib.pyplot as plt
-from regrid_r1i1p1f1_mrso import Remap
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from cmip_remap import run  # noqa: E402
+
 
 def main():
-    save_flag = True
-    variable = 'tos'
-    realm = 'Omon'
-    model = 'GISS-E2-1-H'
-    begin_time = 1850
-    end_time = 1900
-
-    remap = Remap(save_flag, variable, realm, model)
-    remap.regrid(*remap.load(1850, 1900))
-    for i in range(1901, 2001, 50):
-        remap.regrid(*remap.load(i, i+49))
-    remap.regrid(*remap.load(2001, 2014))
-    inp, _, _ = remap.load(begin_time, end_time)
-    remap.plot(inp)
+    run(
+        variable='tos',
+        realm='Omon',
+        model='GISS-E2-1-H',
+        periods=[(1850, 1900), (1901, 1950), (1951, 2000), (2001, 2014)],
+    )
 
 
 if __name__ == '__main__':
     main()
-

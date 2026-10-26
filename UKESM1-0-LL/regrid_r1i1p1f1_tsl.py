@@ -1,27 +1,20 @@
-import numpy as np
-import cartopy.crs as ccrs
-import xarray as xr
-from cdo import Cdo
-import matplotlib.pyplot as plt
-from regrid_r1i1p1f1_mrso import Remap
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from cmip_remap import run  # noqa: E402
+
 
 def main():
-    save_flag = True
-    variable = 'tsl'
-    realm = 'Lmon'
-    variant = 'r1i1p1f2'
-    grid = 'gn'
-    model = 'UKESM1-0-LL'
-    begin_time = 1850
-    end_time = 1949
-
-    remap = Remap(save_flag, variable, realm, variant, grid, model)
-    remap.regrid(*remap.load(begin_time, end_time))
-    remap.regrid(*remap.load(1950, 2014))
-    inp, _, _ = remap.load(begin_time, end_time)
-    remap.plot(inp)
+    run(
+        variable='tsl',
+        realm='Lmon',
+        model='UKESM1-0-LL',
+        variant='r1i1p1f2',
+        periods=[(1850, 1949), (1950, 2014)],
+        plot_mode='first',
+    )
 
 
 if __name__ == '__main__':
     main()
-

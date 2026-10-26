@@ -1,37 +1,20 @@
-import numpy as np
-import cartopy.crs as ccrs
-import xarray as xr
-from cdo import Cdo
-import matplotlib.pyplot as plt
-from regrid_r1i1p1f1_mrso import Remap
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from cmip_remap import chunks, run  # noqa: E402
+
 
 def main():
-    save_flag = True
-    variable = 'tsl'
-    realm = 'Lmon'
-    model = 'GISS-E3-G'
-    begin_time = 1850
-    end_time = 1899
-
-    remap = Remap(save_flag, variable, realm, model)
-    remap.regrid(*remap.load(begin_time, end_time))
-    remap.regrid(*remap.load(1900, 1949))
-    remap.regrid(*remap.load(1950, 1999))
-    remap.regrid(*remap.load(2000, 2014))
-    inp, _, _ = remap.load(begin_time, end_time)
-    plot(inp)
-
-def plot(infile, origin='lower'):
-    cdo = Cdo()
-    projection = ccrs.PlateCarree(central_longitude=180)
-    img_extent = (-180,180,-90,90)
-    val = cdo.remapbil('r360x180', input=f'-seltimestep,1 '+infile, returnXArray='tsl')
-    data = val[0,0,:,:].plot(subplot_kws=dict(projection=projection,facecolor='gray'),
-                   transform=projection)
-    data.axes.coastlines()
-    plt.show()
+    run(
+        variable='tsl',
+        realm='Lmon',
+        model='GISS-E3-G',
+        grid='gr',
+        periods=chunks(1850, 2000, 50) + [(2000, 2014)],
+        plot_mode='first',
+    )
 
 
 if __name__ == '__main__':
     main()
-

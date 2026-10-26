@@ -1,24 +1,19 @@
-import cartopy.crs as ccrs
-import xarray as xr
-from netCDF4 import Dataset
-from cdo import Cdo
-import matplotlib.pyplot as plt
-from regrid_r1i1p1f1_mrso import Remap
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from cmip_remap import run  # noqa: E402
+
 
 def main():
-    save_flag = True
-    variable = 'pr'
-    realm = 'Amon'
-    model = 'HadGEM3-GC31-LL'
-    begin_time = 1850
-    end_time = 1949
+    run(
+        variable='pr',
+        realm='Amon',
+        model='HadGEM3-GC31-LL',
+        variant='r1i1p1f3',
+        periods=[(1850, 1949), (1950, 2014)],
+    )
 
-    remap = Remap(save_flag, variable, realm, model)
-    remap.regrid(*remap.load(begin_time, end_time))
-    remap.regrid(*remap.load(1950, 2014))
-    inp, _, _ = remap.load(begin_time, end_time)
-    remap.plot(inp)
 
 if __name__ == '__main__':
     main()
-
