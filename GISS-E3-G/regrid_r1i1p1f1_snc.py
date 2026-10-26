@@ -1,26 +1,19 @@
-import cartopy.crs as ccrs
-import xarray as xr
-from cdo import Cdo
-import matplotlib.pyplot as plt
-from regrid_r1i1p1f1_mrso import Remap
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from cmip_remap import chunks, run  # noqa: E402
+
 
 def main():
-    save_flag = True
-    variable = 'snc'
-    realm = 'LImon'
-    model = 'GISS-E3-G'
-    begin_time = 1850
-    end_time = 1899
-
-    remap = Remap(save_flag, variable, realm, model)
-    remap.regrid(*remap.load(begin_time, end_time))
-    remap.regrid(*remap.load(1900, 1949))
-    remap.regrid(*remap.load(1950, 1999))
-    remap.regrid(*remap.load(2000, 2014))
-    inp, _, _ = remap.load(begin_time, end_time)
-    remap.plot(inp)
+    run(
+        variable='snc',
+        realm='LImon',
+        model='GISS-E3-G',
+        grid='gr',
+        periods=chunks(1850, 2000, 50) + [(2000, 2014)],
+    )
 
 
 if __name__ == '__main__':
     main()
-

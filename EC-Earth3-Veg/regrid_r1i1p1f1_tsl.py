@@ -1,36 +1,20 @@
-import numpy as np
-import cartopy.crs as ccrs
-import xarray as xr
-from cdo import Cdo
-import matplotlib.pyplot as plt
-from regrid_r1i1p1f1_mrso import Remap
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from cmip_remap import chunks, run  # noqa: E402
+
 
 def main():
-    save_flag = True
-    variable = 'tsl'
-    realm = 'Lmon'
-    model = 'EC-Earth3-Veg'
-    first_begin = 1950
-    first_end = 1950
-
-
-    remap = Remap(save_flag, variable, realm, model)
-    for i in range(1950, 2015):
-        remap.regrid(*remap.load(i, i))
-    inp, _, _ = remap.load(first_begin, first_end)
-    plot(inp)
-
-def plot(infile, origin='lower'):
-    cdo = Cdo()
-    projection = ccrs.PlateCarree(central_longitude=180)
-    img_extent = (-180,180,-90,90)
-    val = cdo.remapbil('r360x180', input=f'-seltimestep,1 '+infile, returnXArray='tsl')
-    data = val[0,0,:,:].plot(subplot_kws=dict(projection=projection,facecolor='gray'),
-                   transform=projection)
-    data.axes.coastlines()
-    plt.show()
+    run(
+        variable='tsl',
+        realm='Lmon',
+        model='EC-Earth3-Veg',
+        grid='gr',
+        periods=chunks(1950, 2015, 1),
+        plot_mode='first',
+    )
 
 
 if __name__ == '__main__':
     main()
-
