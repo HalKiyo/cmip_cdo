@@ -10,7 +10,7 @@ def main():
         variable='snc',
         realm='LImon',
         model='NorESM2-LM',
-        periods=chunks(1850, 1990, 10) + [(2000, 2009), (2010, 2014)],
+        periods=chunks(1850, 2010, 10) + [(2010, 2014)],
     )
 
 
